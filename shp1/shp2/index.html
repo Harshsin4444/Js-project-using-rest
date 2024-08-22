@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Tracker</title>
+</head>
+<body>
+<div id="container">
+    <h2>Enter Expense Information</h2>
+    <div>
+        <label for="expense-amount">Choose Amount:</label>
+        <input type="text" id="expense-amount" name="expense-amount" required>;
+    </div>
+    <div>
+        <label for="expense-description">Choose Description:</label>
+        <input type="text" id="expense-description" name="expense-description" required>;
+    </div>
+    <div>
+        <label for="expense-category">Choose Category:</label>
+        <select id="expense-category">
+            <option value="Groceries">Groceries</option>
+            <option value="Dining Out">Dining Out</option>
+            <option value="Gas">Gas</option>
+            <option value="Clothing">Clothing</option>
+        </select>
+    </div>
+    <button onclick="saveExpense()">Save Expense</button>
+    <h2>Saved Expenses</h2>
+    <ul id="expense-list"></ul>
+</div>
+
+<script>
+    // Function to save expense information to localStorage
+    function saveExpense() {
+        var amount = document.getElementById('expense-amount').value;
+        var description = document.getElementById('expense-description').value;
+        var category = document.getElementById('expense-category').value;
+
+        // Create an object to store the expense information
+        var expense = {
+            amount: amount,
+            description: description,
+            category: category
+        };
+
+        // Retrieve existing expense data from localStorage or initialize an empty array
+        var existingExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        // Add new expense object to existing data
+        existingExpenses.push(expense);
+
+        // Save updated data back to localStorage
+        localStorage.setItem('expenses', JSON.stringify(existingExpenses));
+
+        // Clear selection fields (if needed, not in this example as it's a dropdown)
+        // Reset dropdowns to their default values
+        document.getElementById('expense-amount').value = '50';
+        document.getElementById('expense-description').value = 'Food';
+        document.getElementById('expense-category').value = 'Groceries';
+
+        // Call function to display saved expenses
+        displayExpenses();
+    }
+
+    // Function to display saved expenses from localStorage
+    function displayExpenses() {
+        var expenseList = document.getElementById('expense-list');
+        expenseList.innerHTML = ''; // Clear previous content
+
+        var existingExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        existingExpenses.forEach(function(expense, index) {
+            // Create list item
+            var li = document.createElement('li');
+            li.textContent = `Amount: ${expense.amount}, Description: ${expense.description}, Category: ${expense.category}`;
+
+            // Create edit button
+            var editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.onclick = function() {
+                editExpense(index);
+            };
+            li.appendChild(editButton);
+
+            // Create delete button
+            var deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = function() {
+                deleteExpense(index);
+            };
+            li.appendChild(deleteButton);
+
+            // Append list item to list
+            expenseList.appendChild(li);
+        });
+    }
+
+    // Function to edit expense information
+    function editExpense(index) {
+        var existingExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        // Retrieve information at given index
+        var expense = existingExpenses[index];
+
+        // Populate form fields with existing data for editing
+        document.getElementById('expense-amount').value = expense.amount;
+        document.getElementById('expense-description').value = expense.description;
+        document.getElementById('expense-category').value = expense.category;
+
+        // Remove item from array
+        existingExpenses.splice(index, 1);
+
+        // Save updated array back to localStorage
+        localStorage.setItem('expenses', JSON.stringify(existingExpenses));
+
+        // Refresh displayed expenses
+        displayExpenses();
+    }
+
+    // Function to delete expense information
+    function deleteExpense(index) {
+        var existingExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        // Remove item from array
+        existingExpenses.splice(index, 1);
+
+        // Save updated array back to localStorage
+        localStorage.setItem('expenses', JSON.stringify(existingExpenses));
+
+        // Refresh displayed expenses
+        displayExpenses();
+    }
+
+    // Call displayExpenses on page load
+    displayExpenses();
+</script>
+</body>
+</html>

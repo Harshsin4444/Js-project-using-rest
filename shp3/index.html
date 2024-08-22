@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Management</title>
+</head>
+<body>
+<div id="container">
+    <h2>Enter User Information</h2>
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name">
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email">
+    </div>
+    <div>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone">
+    </div>
+    <button onclick="saveUser()">Save User</button>
+    <h2>Saved Users</h2>
+    <ul id="user-list"></ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    // Function to save user information
+    function saveUser() {
+        var name = document.getElementById('name').value;
+        var email = document.getElementById('email').value;
+        var phone = document.getElementById('phone').value;
+
+        // Create an object to store the user information
+        var user = {
+            name: name,
+            email: email,
+            phone: phone
+        };
+
+        // Make a POST request using Axios to save the user
+        axios.post('https://crudcrud.com/api/62f4c9f303714aaab6a772256646a7c2/users', user)
+            .then(function(response) {
+                console.log('User saved:', response.data);
+
+                // Clear input fields
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('phone').value = '';
+
+                // Refresh displayed users
+                displayUsers();
+            })
+            .catch(function(error) {
+                console.error('Error saving user:', error);
+            });
+    }
+
+    // Function to display saved users
+    function displayUsers() {
+        // Make a GET request using Axios to retrieve saved users
+        axios.get('https://crudcrud.com/api/62f4c9f303714aaab6a772256646a7c2/users')
+            .then(function(response) {
+                var userList = document.getElementById('user-list');
+                userList.innerHTML = ''; // Clear previous content
+
+                response.data.forEach(function(user) {
+                    // Create list item
+                    var li = document.createElement('li');
+                    li.textContent = `Name: ${user.name}, Email: ${user.email}, Phone: ${user.phone}`;
+
+                    // Create edit button
+                    var editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.onclick = function() {
+                        editUser(user.id);
+                    };
+                    li.appendChild(editButton);
+
+                    // Create delete button
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = function() {
+                        deleteUser(user.id);
+                    };
+                    li.appendChild(deleteButton);
+
+                    // Append list item to list
+                    userList.appendChild(li);
+                });
+            })
+            .catch(function(error) {
+                console.error('Error fetching users:', error);
+            });
+    }
+
+    // Function to edit user information
+    function editUser(userId) {
+        // Dummy functionality since JSONPlaceholder does not support update
+        console.log('Edit user with ID:', userId);
+    }
+
+    // Function to delete user information
+    function deleteUser(userId) {
+        // Make a DELETE request using Axios to delete the user
+        axios.delete(`https://crudcrud.com/api/62f4c9f303714aaab6a772256646a7c2/users/${userId}`)
+            .then(function(response) {
+                console.log('User deleted:', response.data);
+
+                // Refresh displayed users
+                displayUsers();
+            })
+            .catch(function(error) {
+                console.error('Error deleting user:', error);
+            });
+    }
+
+    // Call displayUsers on page load
+    displayUsers();
+</script>
+</body>
+</html>

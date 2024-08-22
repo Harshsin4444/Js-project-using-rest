@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Storage Example</title>
+</head>
+<body>
+<div id="container">
+    <h2>Enter Information</h2>
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name">
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email">
+    </div>
+    <div>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone">
+    </div>
+    <button onclick="saveInfo()">Save Info</button>
+    <h2>Saved Information</h2>
+    <ul id="info-list"></ul>
+</div>
+
+<script>
+    // Function to save information to localStorage
+    function saveInfo() {
+        var name = document.getElementById('name').value;
+        var email = document.getElementById('email').value;
+        var phone = document.getElementById('phone').value;
+
+        // Check if name, email, and phone are not empty
+        if (name && email && phone) {
+            // Create an object to store the information
+            var info = {
+                name: name,
+                email: email,
+                phone: phone
+            };
+
+            // Retrieve existing data from localStorage or initialize an empty array
+            var existingData = JSON.parse(localStorage.getItem('userInfos')) || [];
+
+            // Add new info object to existing data
+            existingData.push(info);
+
+            // Save updated data back to localStorage
+            localStorage.setItem('userInfos', JSON.stringify(existingData));
+
+            // Clear input fields
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('phone').value = '';
+
+            // Call function to display saved information
+            displayInfo();
+        } else {
+            alert('Please fill in all fields.');
+        }
+    }
+
+    // Function to display saved information from localStorage
+    function displayInfo() {
+        var infoList = document.getElementById('info-list');
+        infoList.innerHTML = ''; // Clear previous content
+
+        var existingData = JSON.parse(localStorage.getItem('userInfos')) || [];
+
+        existingData.forEach(function(info, index) {
+            // Create list item
+            var li = document.createElement('li');
+            li.textContent = `Name: ${info.name}, Email: ${info.email}, Phone: ${info.phone}`;
+
+            // Create edit button
+            var editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.onclick = function() {
+                editInfo(index);
+            };
+            li.appendChild(editButton);
+
+            // Create delete button
+            var deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = function() {
+                deleteInfo(index);
+            };
+            li.appendChild(deleteButton);
+
+            // Append list item to list
+            infoList.appendChild(li);
+        });
+    }
+
+    // Function to edit user information
+    function editInfo(index) {
+        var existingData = JSON.parse(localStorage.getItem('userInfos')) || [];
+
+        // Retrieve information at given index
+        var info = existingData[index];
+
+        // Populate form fields with existing data for editing
+        document.getElementById('name').value = info.name;
+        document.getElementById('email').value = info.email;
+        document.getElementById('phone').value = info.phone;
+
+        // Remove item from array
+        existingData.splice(index, 1);
+
+        // Save updated array back to localStorage
+        localStorage.setItem('userInfos', JSON.stringify(existingData));
+
+        // Refresh displayed information
+        displayInfo();
+    }
+
+    // Function to delete user information
+    function deleteInfo(index) {
+        var existingData = JSON.parse(localStorage.getItem('userInfos')) || [];
+
+        // Remove item from array
+        existingData.splice(index, 1);
+
+        // Save updated array back to localStorage
+        localStorage.setItem('userInfos', JSON.stringify(existingData));
+
+        // Refresh displayed information
+        displayInfo();
+    }
+
+    // Call displayInfo on page load
+    displayInfo();
+</script>
+</body>
+</html>
